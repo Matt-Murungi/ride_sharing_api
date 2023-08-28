@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { UserRole } from './user.roles.enum';
+import { Role } from '../roles/user.roles.enum';
 
 @Entity()
 export class User {
@@ -19,11 +19,11 @@ export class User {
   phoneNumber: string;
 
   @Column({ default: false })
-  isVerified: boolean;
+  isActive: boolean;
 
   @Column({
     type: 'enum',
-    enum: UserRole,
+    enum: Role,
   })
-  role: UserRole;
+  role: Role;
 }
