@@ -9,6 +9,6 @@ export const DBConfig = TypeOrmModule.forRoot({
   username: 'postgres',
   entities: [User],
   database: 'postgres',
-  synchronize: true,
+  synchronize: false,
   logging: true,
 });

@@ -1,10 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import { Role } from '../roles/user.roles.enum';
 
 @Entity()
+@Unique(['phoneNumber'])
+@Unique(['email'])
 export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ type: 'varchar', length: 30 })
   firstName: string;
@@ -18,8 +20,8 @@ export class User {
   @Column({ type: 'varchar', length: 10 })
   phoneNumber: string;
 
-  @Column({ default: false })
-  isActive: boolean;
+  @Column({ default: true })
+  isActive?: boolean;
 
   @Column({
     type: 'enum',

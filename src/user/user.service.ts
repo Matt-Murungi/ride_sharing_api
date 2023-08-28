@@ -1,8 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 
 @Injectable()
@@ -14,10 +14,19 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     try {
       const response = await this.userRepository.save(createUserDto);
-      Logger.debug('Response is ', response);
       return response;
-    } catch (exception) {
-      Logger.error('Response is ', exception);
+    } catch (error) {
+      if (error instanceof QueryFailedError) {
+        if (error['detail'].includes('email')) {
+          throw new HttpException('Email already exists', HttpStatus.CONFLICT);
+        } else if (error['detail'].includes('phoneNumber')) {
+          throw new HttpException(
+            'Phone number already exists',
+            HttpStatus.CONFLICT,
+          );
+        }
+      }
+      throw error;
     }
   }
 
