@@ -1,9 +1,10 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QueryFailedError, Repository } from 'typeorm';
+import {  Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { hashPassword } from 'src/auth/utils/utils';
 
 @Injectable()
 export class UserService {
@@ -11,26 +12,12 @@ export class UserService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
-    try {
-      const response = await this.userRepository.save(createUserDto);
-      return response;
-    } catch (error) {
-      if (error instanceof QueryFailedError) {
-        if (error['detail'].includes('email')) {
-          throw new HttpException('Email already exists', HttpStatus.CONFLICT);
-        } else if (error['detail'].includes('phoneNumber')) {
-          throw new HttpException(
-            'Phone number already exists',
-            HttpStatus.CONFLICT,
-          );
-        }
-      }
-      throw error;
-    }
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+    const response = await this.userRepository.save(createUserDto);
+    return response;
   }
 
-  findAll() {
+  async findAll() {
     return `This action returns all user`;
   }
 
@@ -38,8 +25,8 @@ export class UserService {
     return `This action returns a #${id} user`;
   }
 
-  findUserByPhoneNumber(phoneNumber: String) {
-    return `This action returns a #${phoneNumber} user`;
+  async findOneByEmail(email: string) {
+    return await this.userRepository.findOneBy({ email });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

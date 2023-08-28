@@ -21,6 +21,10 @@ export class CreateUserDto {
   @IsNotEmpty()
   phoneNumber: string;
 
+  @ApiProperty()
+  @IsNotEmpty()
+  password: string;
+
   @ApiProperty({ enum: [Role.ADMIN, Role.DRIVER, Role.RIDER] })
   @IsEnum(Role)
   role: DeepPartial<Role>;
