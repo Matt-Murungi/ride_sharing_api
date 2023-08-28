@@ -6,14 +6,17 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { LogInDTO } from './dto/create-auth.dto';
+import { LogInDTO, RegisterUserDTO } from './dto/create-auth.dto';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import { checkPassword, hashPassword } from './utils/utils';
 import { QueryFailedError } from 'typeorm';
 import { Public } from './auth.decorator';
+import { ApiTags } from '@nestjs/swagger';
+import { Role } from 'src/user/roles/user.roles.enum';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -46,6 +49,7 @@ export class AuthController {
   async register(@Body() registerData: CreateUserDto) {
     try {
       registerData.password = hashPassword(registerData.password);
+      registerData.role = Role.RIDER;
       const user = await this.userService.createUser(registerData);
 
       const payload = { id: user.id };

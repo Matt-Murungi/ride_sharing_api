@@ -25,7 +25,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   password: string;
 
-  @ApiProperty({ enum: [Role.ADMIN, Role.DRIVER, Role.RIDER] })
+  @ApiProperty({ enum: [Role.RIDER, Role.ADMIN, Role.DRIVER] })
   @IsEnum(Role)
   role: DeepPartial<Role>;
 }
