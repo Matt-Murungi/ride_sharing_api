@@ -15,7 +15,7 @@ export class RideRequestService {
   }
 
   findAll() {
-    return `This action returns all rideRequest`;
+    return this.rideRepository.find();
   }
 
   async findOne(id: string) {

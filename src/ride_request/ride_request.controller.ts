@@ -68,10 +68,6 @@ export class RideRequestController {
     return this.rideRequestService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.rideRequestService.findOne(id);
-  }
 
   @Patch('accept-reject')
   async assignDriverToRide(@Body() driverRequestData: DriverRideAssignmentDto) {
