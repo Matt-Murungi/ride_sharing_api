@@ -29,3 +29,14 @@ export class CreateUserDto {
   @IsEnum(Role)
   role: DeepPartial<Role>;
 }
+
+export class LogInDTO {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  password: string;
+}

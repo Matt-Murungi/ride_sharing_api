@@ -1,5 +1,6 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
+import { RideRequest } from '../ride_request/entities/ride_request.entity';
 
 export const DBConfig = TypeOrmModule.forRoot({
   type: 'postgres',
@@ -7,8 +8,8 @@ export const DBConfig = TypeOrmModule.forRoot({
   port: 5432,
   password: 'ride_sharing_db',
   username: 'postgres',
-  entities: [User],
+  entities: [User, RideRequest],
   database: 'postgres',
-  synchronize: false,
+  synchronize: true,
   logging: true,
 });

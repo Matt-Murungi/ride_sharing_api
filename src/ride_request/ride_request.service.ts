@@ -1,11 +1,19 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateRideRequestDto } from './dto/create-ride_request.dto';
 import { UpdateRideRequestDto } from './dto/update-ride_request.dto';
+import { RideRequest } from './entities/ride_request.entity';
 
 @Injectable()
 export class RideRequestService {
-  create(createRideRequestDto: CreateRideRequestDto) {
-    return 'This action adds a new rideRequest';
+  constructor(
+    @InjectRepository(RideRequest)
+    private rideRepository: Repository<RideRequest>,
+  ) {}
+
+  async create(rideRequest: RideRequest): Promise<RideRequest> {
+    return await this.rideRepository.save(rideRequest);
   }
 
   findAll() {

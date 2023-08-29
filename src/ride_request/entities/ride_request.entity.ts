@@ -1,21 +1,20 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
-  Unique,
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { RideStatus } from './ride.status.enum';
 
 @Entity()
-@Unique(['phoneNumber'])
-@Unique(['email'])
 export class RideRequest {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @OneToOne(() => User)
+  @JoinColumn()
   user: User;
 
   @OneToOne(() => User)

@@ -8,22 +8,26 @@ import {
   Delete,
   HttpException,
   HttpStatus,
-  UseGuards,
   Request,
+  BadRequestException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, LogInDTO } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { QueryFailedError } from 'typeorm/error/QueryFailedError';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '../auth/auth.guard';
-import { Public } from 'src/auth/auth.decorator';
+import { Public } from 'src/user/auth.decorator';
+import { checkPassword } from './utils/utils';
+import { JwtService } from '@nestjs/jwt';
 
 @ApiBearerAuth()
 @ApiTags('Users')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private jwtService: JwtService,
+  ) {}
 
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto) {
@@ -54,7 +58,6 @@ export class UserController {
     return this.userService.findAll();
   }
 
-
   @Get('profile')
   findUser(@Request() req) {
     return req.user;
@@ -69,5 +72,25 @@ export class UserController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
+  }
+
+  @Public()
+  @Post('login')
+  async login(@Body() loginData: LogInDTO) {
+    const user = await this.userService.findOneByEmail(loginData.email);
+
+    if (!user) {
+      throw new BadRequestException('Invalid Credentials');
+    }
+
+    if (!(await checkPassword(loginData.password, user.password))) {
+      throw new BadRequestException('Invalid Password');
+    }
+
+    const payload = { id: user.id };
+
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 }
