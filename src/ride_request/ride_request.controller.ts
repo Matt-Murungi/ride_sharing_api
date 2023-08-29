@@ -92,6 +92,10 @@ export class RideRequestController {
       throw new BadRequestException('The user is not a driver');
     }
 
+    if (driver.isOnTrip) {
+      throw new BadRequestException('Driver is already on trip');
+    }
+
     ride.driver = driver;
 
     if (

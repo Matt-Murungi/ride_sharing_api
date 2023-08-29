@@ -17,8 +17,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { QueryFailedError } from 'typeorm/error/QueryFailedError';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/user/auth.decorator';
-import { checkPassword } from './utils/utils';
+import { checkPassword, hashPassword } from './utils/utils';
 import { JwtService } from '@nestjs/jwt';
+import { UpdateUserRequestDto } from 'src/ride_request/dto/update-driver_request.dto';
 
 @ApiBearerAuth()
 @ApiTags('Users')
@@ -32,6 +33,7 @@ export class UserController {
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto) {
     try {
+      createUserDto.password = hashPassword(createUserDto.password);
       const user = await this.userService.createUser(createUserDto);
       return user;
     } catch (error) {
@@ -64,14 +66,20 @@ export class UserController {
     // return this.userService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
+  @Patch('driver-availability')
+  async update(@Body() driverData: UpdateUserRequestDto) {
+    const driver = await this.userService.findOne(driverData.driverId);
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+    if (!driver) {
+      throw new BadRequestException('Driver does not exist');
+    }
+    if (driverData.isActive) {
+      driver.isActive = true;
+    } else {
+      driver.isActive = false;
+    }
+
+    return await this.userService.update(driver);
   }
 
   @Public()
