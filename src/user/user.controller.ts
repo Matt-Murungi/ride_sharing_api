@@ -12,13 +12,12 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto, LogInDTO } from './dto/create-user.dto';
 import { QueryFailedError } from 'typeorm/error/QueryFailedError';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/user/auth.decorator';
 import { checkPassword, hashPassword } from './utils/utils';
 import { JwtService } from '@nestjs/jwt';
 import { UpdateUserRequestDto } from 'src/ride_request/dto/update-driver_request.dto';
+import { ApiTags } from '@nestjs/swagger';
 
-@ApiBearerAuth()
 @ApiTags('Users')
 @Controller('user')
 export class UserController {

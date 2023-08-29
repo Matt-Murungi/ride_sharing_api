@@ -18,8 +18,10 @@ import { RideStatus } from './entities/ride.status.enum';
 import { QueryFailedError } from 'typeorm';
 import { Role } from 'src/user/roles/user.roles.enum';
 import { DriverRideAssignmentDto } from './dto/assign-driver_ride_request.dto';
+import { ApiTags } from '@nestjs/swagger';
 
-@Controller('ride-request')
+@ApiTags('Ride')
+@Controller('ride')
 export class RideRequestController {
   constructor(
     private readonly rideRequestService: RideRequestService,
@@ -119,7 +121,6 @@ export class RideRequestController {
     }
 
     return await this.rideRequestService.update(ride);
-
   }
 
   @Patch('status')
