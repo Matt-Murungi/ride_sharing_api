@@ -91,7 +91,7 @@ export class RideRequestController {
       throw new BadRequestException('The user is not a driver');
     }
 
-    if (driver.isOnTrip) {
+    if (driver.isOnTrip && ride.status != RideStatus.ACCEPTED) {
       throw new BadRequestException('Driver is already on trip');
     }
 
@@ -119,6 +119,7 @@ export class RideRequestController {
     }
 
     return await this.rideRequestService.update(ride);
+
   }
 
   @Patch('status')

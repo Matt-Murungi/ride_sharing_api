@@ -23,9 +23,10 @@ export class RideRequestService {
   }
 
   async update(rideRequest: RideRequest) {
-    return await this.rideRepository.update(rideRequest.id, {
+    await this.rideRepository.update(rideRequest.id, {
       ...rideRequest,
     });
+    return this.findOne(rideRequest.id);
   }
 
   remove(id: number) {
