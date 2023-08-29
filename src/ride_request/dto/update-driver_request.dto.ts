@@ -5,7 +5,4 @@ export class UpdateUserRequestDto {
   @ApiProperty()
   @IsNotEmpty()
   driverId: string;
-
-  @ApiProperty()
-  isActive: boolean;
 }

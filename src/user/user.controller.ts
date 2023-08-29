@@ -4,8 +4,6 @@ import {
   Post,
   Body,
   Patch,
-  Param,
-  Delete,
   HttpException,
   HttpStatus,
   Request,
@@ -13,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, LogInDTO } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { QueryFailedError } from 'typeorm/error/QueryFailedError';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/user/auth.decorator';
@@ -69,17 +66,16 @@ export class UserController {
   @Patch('driver-availability')
   async update(@Body() driverData: UpdateUserRequestDto) {
     const driver = await this.userService.findOne(driverData.driverId);
-
     if (!driver) {
       throw new BadRequestException('Driver does not exist');
     }
-    if (driverData.isActive) {
-      driver.isActive = true;
-    } else {
-      driver.isActive = false;
-    }
+    driver.isActive = !driver.isActive;
 
-    return await this.userService.update(driver);
+    await this.userService.update(driver);
+
+    return {
+      msg: `Driver availability is ${driver.isActive}`,
+    };
   }
 
   @Public()

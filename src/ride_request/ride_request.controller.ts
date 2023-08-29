@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   BadRequestException,
   HttpException,
   HttpStatus,
@@ -96,6 +95,10 @@ export class RideRequestController {
       throw new BadRequestException('Driver is already on trip');
     }
 
+    if (!driver.isActive) {
+      throw new BadRequestException('Driver is not available');
+    }
+
     ride.driver = driver;
 
     if (
@@ -104,8 +107,12 @@ export class RideRequestController {
     ) {
       if (driverRequestData.status == RideStatus.ACCEPTED) {
         ride.status = RideStatus.ACCEPTED;
+        driver.isOnTrip = true;
+        await this.userService.update(driver);
       } else {
         ride.status = RideStatus.CANCELLED;
+        driver.isOnTrip = false;
+        await this.userService.update(driver);
       }
     } else {
       throw new BadRequestException('You can only accept/cancel ride');
