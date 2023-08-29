@@ -8,11 +8,11 @@ import { AuthGuard } from './auth.guard';
 @Module({
   imports: [UserModule, JwtSettings],
   controllers: [AuthController],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
-  ],
+  // providers: [
+  //   {
+  //     provide: APP_GUARD,
+  //     useClass: AuthGuard,
+  //   },
+  // ],
 })
 export class AuthModule {}

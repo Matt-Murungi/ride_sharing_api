@@ -8,13 +8,18 @@ import {
   Delete,
   HttpException,
   HttpStatus,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { QueryFailedError } from 'typeorm/error/QueryFailedError';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '../auth/auth.guard';
+import { Public } from 'src/auth/auth.decorator';
 
+@ApiBearerAuth()
 @ApiTags('Users')
 @Controller('user')
 export class UserController {
@@ -49,9 +54,11 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+
+  @Get('profile')
+  findUser(@Request() req) {
+    return req.user;
+    // return this.userService.findOne(id);
   }
 
   @Patch(':id')

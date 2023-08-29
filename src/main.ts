@@ -11,6 +11,7 @@ async function bootstrap() {
     .setTitle('Ride Sharing API')
     .setDescription('Simple API')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
@@ -22,6 +23,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 

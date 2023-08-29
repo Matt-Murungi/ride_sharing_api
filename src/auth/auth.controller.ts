@@ -6,7 +6,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { LogInDTO, RegisterUserDTO } from './dto/create-auth.dto';
+import { LogInDTO } from './dto/create-auth.dto';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
@@ -42,37 +42,5 @@ export class AuthController {
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
-  }
-
-  @Public()
-  @Post('register')
-  async register(@Body() registerData: CreateUserDto) {
-    try {
-      registerData.password = hashPassword(registerData.password);
-      registerData.role = Role.RIDER;
-      const user = await this.userService.createUser(registerData);
-
-      const payload = { id: user.id };
-
-      return {
-        access_token: await this.jwtService.signAsync(payload),
-      };
-    } catch (error) {
-      if (error instanceof QueryFailedError) {
-        if (error['detail'].includes('email')) {
-          throw new HttpException('Email already exists', HttpStatus.CONFLICT);
-        } else if (error['detail'].includes('phoneNumber')) {
-          throw new HttpException(
-            'Phone number already exists',
-            HttpStatus.CONFLICT,
-          );
-        }
-      } else {
-        throw new HttpException(
-          'Something is wrong, try again later',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-    }
   }
 }
