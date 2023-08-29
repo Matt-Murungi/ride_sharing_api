@@ -18,7 +18,8 @@ export class RideRequest {
   user: User;
 
   @OneToOne(() => User)
-  driver: User;
+  @JoinColumn()
+  driver?: User;
 
   @Column({ type: 'varchar', length: 30 })
   pickupLocation: string;

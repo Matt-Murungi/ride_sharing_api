@@ -17,6 +17,8 @@ import { UserService } from 'src/user/user.service';
 import { RideRequest } from './entities/ride_request.entity';
 import { RideStatus } from './entities/ride.status.enum';
 import { QueryFailedError } from 'typeorm';
+import { Role } from 'src/user/roles/user.roles.enum';
+import { DriverRideAssignmentDto } from './dto/assign-driver_ride_request.dto';
 
 @Controller('ride-request')
 export class RideRequestController {
@@ -31,6 +33,12 @@ export class RideRequestController {
       const user = await this.userService.findOne(createRideRequestData.userId);
       if (!user) {
         throw new BadRequestException('User not found');
+      }
+
+      if (user.role == Role.DRIVER) {
+        throw new BadRequestException(
+          'Driver not allowed to create ride request',
+        );
       }
 
       const payload = new RideRequest();
@@ -52,7 +60,6 @@ export class RideRequestController {
         );
       }
     }
-
   }
 
   @Get()
@@ -62,19 +69,59 @@ export class RideRequestController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.rideRequestService.findOne(+id);
+    return this.rideRequestService.findOne(id);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateRideRequestDto: UpdateRideRequestDto,
-  ) {
-    return this.rideRequestService.update(+id, updateRideRequestDto);
+  @Patch('accept-reject')
+  async assignDriverToRide(@Body() driverRequestData: DriverRideAssignmentDto) {
+    const ride = await this.rideRequestService.findOne(
+      driverRequestData.rideId,
+    );
+
+    if (!ride) {
+      throw new BadRequestException('Ride does not exist');
+    }
+
+    const driver = await this.userService.findOne(driverRequestData.driverId);
+
+    if (!driver) {
+      throw new BadRequestException('Driver does not exist');
+    }
+
+    if (driver.role != Role.DRIVER) {
+      throw new BadRequestException('The user is not a driver');
+    }
+
+    ride.driver = driver;
+
+    if (
+      driverRequestData.status == RideStatus.ACCEPTED ||
+      driverRequestData.status == RideStatus.CANCELLED
+    ) {
+      if (driverRequestData.status == RideStatus.ACCEPTED) {
+        ride.status = RideStatus.ACCEPTED;
+      } else {
+        ride.status = RideStatus.CANCELLED;
+      }
+    } else {
+      throw new BadRequestException('You can only accept/cancel ride');
+    }
+
+    return await this.rideRequestService.update(ride);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.rideRequestService.remove(+id);
+  @Patch('status')
+  async updateRideStatus(@Body() updateRideRequestData: UpdateRideRequestDto) {
+    const ride = await this.rideRequestService.findOne(
+      updateRideRequestData.rideId,
+    );
+
+    if (!ride) {
+      throw new BadRequestException('Ride does not exist');
+    }
+
+    ride.status = updateRideRequestData.status;
+
+    return await this.rideRequestService.update(ride);
   }
 }
