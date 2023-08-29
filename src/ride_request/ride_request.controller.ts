@@ -4,7 +4,6 @@ import {
   Post,
   Body,
   Patch,
-  Param,
   BadRequestException,
   HttpException,
   HttpStatus,
@@ -18,7 +17,7 @@ import { RideStatus } from './entities/ride.status.enum';
 import { QueryFailedError } from 'typeorm';
 import { Role } from 'src/user/roles/user.roles.enum';
 import { DriverRideAssignmentDto } from './dto/assign-driver_ride_request.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Ride')
 @Controller('ride')
@@ -28,6 +27,10 @@ export class RideRequestController {
     private readonly userService: UserService,
   ) {}
 
+  @ApiOperation({
+    summary:
+      'Allows users to create rides and assigns the ride status as pending. Only a user assigned as a rider is able to create a ride',
+  })
   @Post()
   async createRide(@Body() createRideRequestData: CreateRideRequestDto) {
     try {
@@ -63,12 +66,18 @@ export class RideRequestController {
     }
   }
 
+  @ApiOperation({
+    summary: 'Retrieves all rides in the system including their statuses',
+  })
   @Get()
   findAll() {
     return this.rideRequestService.findAll();
   }
 
-
+  @ApiOperation({
+    summary:
+      'Allows driver to accept/reject rides. Only a user assigned as a driver and set as available is able to accept rides',
+  })
   @Patch('accept-reject')
   async assignDriverToRide(@Body() driverRequestData: DriverRideAssignmentDto) {
     const ride = await this.rideRequestService.findOne(
@@ -119,6 +128,10 @@ export class RideRequestController {
     return await this.rideRequestService.update(ride);
   }
 
+  @ApiOperation({
+    summary:
+      'Updates ride status under the following categories [pending, accepted, completed, cancelled]',
+  })
   @Patch('status')
   async updateRideStatus(@Body() updateRideRequestData: UpdateRideRequestDto) {
     const ride = await this.rideRequestService.findOne(

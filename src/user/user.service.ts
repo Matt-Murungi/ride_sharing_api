@@ -16,7 +16,7 @@ export class UserService {
   }
 
   async findAll() {
-    return `This action returns all user`;
+    return this.userRepository.find();
   }
 
   async findOne(id: string) {
@@ -28,8 +28,9 @@ export class UserService {
   }
 
   async update(driverDto: User) {
-    return await this.userRepository.update(driverDto.id, {
+    await this.userRepository.update(driverDto.id, {
       ...driverDto,
     });
+    return this.findOne(driverDto.id);
   }
 }
